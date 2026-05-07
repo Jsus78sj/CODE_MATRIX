@@ -9,17 +9,10 @@ from wbb.utils.dbfunctions import (
     whitelist_chat,
 )
 
-__MODULE__ = "Blacklist Chat"
-__HELP__ = """
-**THIS MODULE IS ONLY FOR DEVS**
-
-Use this module to make the bot leave some chats
-in which you don't want it to be in.
-
-/blacklist_chat [CHAT_ID] - Blacklist a chat.
-/whitelist_chat [CHAT_ID] - Whitelist a chat.
-/blacklisted - Show blacklisted chats.
-"""
+__MODULE__ = "حظر المجموعات"
+__HELP__ = """/blacklistchat - حظر المجموعة من استخدام البوت.
+/whitelistchat - فك حظر المجموعة.
+🔸 السودو فقط."""
 
 
 @app.on_message(filters.command("blacklist_chat") & SUDOERS)

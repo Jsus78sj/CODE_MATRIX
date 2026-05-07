@@ -53,32 +53,34 @@ from wbb.utils.functions import (
     time_converter,
 )
 
-__MODULE__ = "Admin"
-__HELP__ = """/ban - Ban A User
-/dban - Delete the replied message banning its sender
-/tban - Ban A User For Specific Time
-/unban - Unban A User
-/listban - Ban a user from groups listed in a message
-/listunban - Unban a user from groups listed in a message
-/warn - Warn A User
-/dwarn - Delete the replied message warning its sender
-/rmwarns - Remove All Warning of A User
-/warns - Show Warning Of A User
-/kick - Kick A User
-/dkick - Delete the replied message kicking its sender
-/purge - Purge Messages
-/purge [n] - Purge "n" number of messages from replied message
-/del - Delete Replied Message
-/promote - Promote A Member
-/fullpromote - Promote A Member With All Rights
-/demote - Demote A Member
-/pin - Pin A Message
-/mute - Mute A User
-/tmute - Mute A User For Specific Time
-/unmute - Unmute A User
-/ban_ghosts - Ban Deleted Accounts
-/report | @admins | @admin - Report A Message To Admins.
-/invite - Send Group/SuperGroup Invite Link."""
+__MODULE__ = "الإدارة"
+__HELP__ = """/ban - حظر مستخدم
+/dban - حذف الرسالة المردود عليها وحظر صاحبها
+/tban - حظر مستخدم لمدة محددة
+/unban - فك حظر مستخدم
+/listban - حظر مستخدم من عدة مجموعات
+/listunban - فك حظر مستخدم من عدة مجموعات
+/warn - تحذير مستخدم
+/dwarn - حذف الرسالة المردود عليها وتحذير صاحبها
+/rmwarns - إزالة كل تحذيرات مستخدم
+/warns - عرض تحذيرات مستخدم
+/kick - طرد مستخدم
+/dkick - حذف الرسالة وطرد صاحبها
+/purge - حذف الرسائل
+/purge [n] - حذف عدد n من الرسائل بدءاً من المردود عليها
+/del - حذف الرسالة المردود عليها
+/promote - رفع رتبة (مشرف)
+/fullpromote - رفع رتبة كاملة
+/demote - تنزيل رتبة
+/pin - تثبيت رسالة
+/mute - كتم مستخدم
+/tmute - كتم مستخدم لمدة محددة
+/unmute - فك كتم مستخدم
+/ban_ghosts - حظر الحسابات المحذوفة
+/report | @admins | @admin - الإبلاغ عن رسالة للمشرفين
+/invite - إرسال رابط دعوة المجموعة
+
+🔸 الأوامر العربية: حظر، الغاء_حظر، طرد، كتم، الغاء_كتم، تحذير، تحذيراتي، حذف، رفع، تنزيل، تثبيت، الغاء_تثبيت، تطهير، رابط، بلاغ"""
 
 
 async def member_permissions(chat_id: int, user_id: int):
@@ -108,6 +110,7 @@ async def member_permissions(chat_id: int, user_id: int):
 
 
 from wbb.core.decorators.permissions import adminsOnly
+from wbb.utils.acmd import cmd as acmd
 
 admins_in_chat = {}
 
@@ -152,14 +155,14 @@ async def admin_cache_func(_, cmu: ChatMemberUpdated):
 # Purge Messages
 
 
-@app.on_message(filters.command("purge") & ~filters.private)
+@app.on_message((filters.command("purge") | acmd(ar=["تطهير", "حذف_رسائل"])) & ~filters.private)
 @adminsOnly("can_delete_messages")
 async def purgeFunc(_, message: Message):
     repliedmsg = message.reply_to_message
     await message.delete()
 
     if not repliedmsg:
-        return await message.reply_text("Reply to a message to purge from.")
+        return await message.reply_text("ردّ على رسالة لبدء الحذف منها.")
 
     cmd = message.command
     if len(cmd) > 1 and cmd[1].isdigit():
@@ -201,27 +204,27 @@ async def purgeFunc(_, message: Message):
 # Kick members
 
 
-@app.on_message(filters.command(["kick", "dkick"]) & ~filters.private)
+@app.on_message((filters.command(["kick", "dkick"]) | acmd(ar=["طرد", "اطرد", "حذف_طرد"])) & ~filters.private)
 @adminsOnly("can_restrict_members")
 async def kickFunc(_, message: Message):
     user_id, reason = await extract_user_and_reason(message)
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("لا أستطيع العثور على هذا المستخدم.")
     if user_id == BOT_ID:
         return await message.reply_text(
-            "I can't kick myself, i can leave if you want."
+            "لا أستطيع طرد نفسي، يمكنني المغادرة إذا أردت."
         )
     if user_id in SUDOERS:
-        return await message.reply_text("You Wanna Kick The Elevated One?")
+        return await message.reply_text("هل تريد طرد مالك البوت؟")
     if user_id in (await list_admins(message.chat.id)):
         return await message.reply_text(
-            "I can't kick an admin, You know the rules, so do i."
+            "لا أستطيع طرد مشرف، القوانين معروفة."
         )
     mention = (await app.get_users(user_id)).mention
     msg = f"""
-**Kicked User:** {mention}
-**Kicked By:** {message.from_user.mention if message.from_user else 'Anon'}
-**Reason:** {reason or 'No Reason Provided.'}"""
+**المستخدم المطرود:** {mention}
+**طُرد بواسطة:** {message.from_user.mention if message.from_user else 'مجهول'}
+**السبب:** {reason or 'لم يُذكر سبب.'}"""
     if message.command[0][0] == "d":
         await message.reply_to_message.delete()
     await message.chat.ban_member(user_id)
@@ -236,24 +239,24 @@ async def kickFunc(_, message: Message):
 # Ban members
 
 
-@app.on_message(filters.command(["ban", "dban", "tban"]) & ~filters.private)
+@app.on_message((filters.command(["ban", "dban", "tban"]) | acmd(ar=["حظر", "بان", "حذف_حظر", "حظر_مؤقت"])) & ~filters.private)
 @adminsOnly("can_restrict_members")
 async def banFunc(_, message: Message):
     user_id, reason = await extract_user_and_reason(message, sender_chat=True)
 
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("لا أستطيع العثور على هذا المستخدم.")
     if user_id == BOT_ID:
         return await message.reply_text(
-            "I can't ban myself, i can leave if you want."
+            "لا أستطيع حظر نفسي، يمكنني المغادرة إذا أردت."
         )
     if user_id in SUDOERS:
         return await message.reply_text(
-            "You Wanna Ban The Elevated One?, RECONSIDER!"
+            "هل تريد حظر مالك البوت؟ فكّر مرة أخرى!"
         )
     if user_id in (await list_admins(message.chat.id)):
         return await message.reply_text(
-            "I can't ban an admin, You know the rules, so do i."
+            "لا أستطيع حظر مشرف، القوانين معروفة."
         )
 
     try:
@@ -262,12 +265,12 @@ async def banFunc(_, message: Message):
         mention = (
             message.reply_to_message.sender_chat.title
             if message.reply_to_message
-            else "Anon"
+            else "مجهول"
         )
 
     msg = (
-        f"**Banned User:** {mention}\n"
-        f"**Banned By:** {message.from_user.mention if message.from_user else 'Anon'}\n"
+        f"**المستخدم المحظور:** {mention}\n"
+        f"**حُظر بواسطة:** {message.from_user.mention if message.from_user else 'مجهول'}\n"
     )
     if message.command[0][0] == "d":
         await message.reply_to_message.delete()
@@ -276,9 +279,9 @@ async def banFunc(_, message: Message):
         time_value = split[0]
         temp_reason = split[1] if len(split) > 1 else ""
         temp_ban = await time_converter(message, time_value)
-        msg += f"**Banned For:** {time_value}\n"
+        msg += f"**مدة الحظر:** {time_value}\n"
         if temp_reason:
-            msg += f"**Reason:** {temp_reason}"
+            msg += f"**السبب:** {temp_reason}"
         with suppress(AttributeError):
             if len(time_value[:-1]) < 3:
                 await message.chat.ban_member(user_id, until_date=temp_ban)
@@ -287,10 +290,10 @@ async def banFunc(_, message: Message):
                     message = replied_message
                 await message.reply_text(msg)
             else:
-                await message.reply_text("You can't use more than 99")
+                await message.reply_text("لا يمكنك استخدام أكثر من 99")
         return
     if reason:
-        msg += f"**Reason:** {reason}"
+        msg += f"**السبب:** {reason}"
     await message.chat.ban_member(user_id)
     replied_message = message.reply_to_message
     if replied_message:
@@ -301,7 +304,7 @@ async def banFunc(_, message: Message):
 # Unban members
 
 
-@app.on_message(filters.command("unban") & ~filters.private)
+@app.on_message((filters.command("unban") | acmd(ar=["الغاء_حظر", "فك_حظر"])) & ~filters.private)
 @adminsOnly("can_restrict_members")
 async def unban_func(_, message: Message):
     # we don't need reasons for unban, also, we
@@ -311,7 +314,7 @@ async def unban_func(_, message: Message):
     reply = message.reply_to_message
 
     if reply and reply.sender_chat and reply.sender_chat != message.chat.id:
-        return await message.reply_text("You cannot unban a channel")
+        return await message.reply_text("لا يمكنك فك حظر قناة")
 
     if len(message.command) == 2:
         user = message.text.split(None, 1)[1]
@@ -319,14 +322,14 @@ async def unban_func(_, message: Message):
         user = message.reply_to_message.from_user.id
     else:
         return await message.reply_text(
-            "Provide a username or reply to a user's message to unban."
+            "أرسل اسم المستخدم أو ردّ على رسالته لفك الحظر."
         )
     await message.chat.unban_member(user)
     umention = (await app.get_users(user)).mention
     replied_message = message.reply_to_message
     if replied_message:
         message = replied_message
-    await message.reply_text(f"Unbanned! {umention}")
+    await message.reply_text(f"تم فك الحظر! {umention}")
 
 
 # Ban users listed in a message
@@ -358,7 +361,7 @@ async def list_ban_(c, message: Message):
         return await message.reply_text("I can't ban myself.")
     if userid in SUDOERS:
         return await message.reply_text(
-            "You Wanna Ban The Elevated One?, RECONSIDER!"
+            "هل تريد حظر مالك البوت؟ فكّر مرة أخرى!"
         )
     splitted = messagelink.split("/")
     uname, mid = splitted[-2], int(splitted[-1])
@@ -388,7 +391,7 @@ async def list_ban_(c, message: Message):
 **Banned User ID:** `{userid}`
 **Admin:** {message.from_user.mention}
 **Affected chats:** `{count}`
-**Reason:** {reason}
+**السبب:** {reason}
 """
     await m.edit_text(msg)
 
@@ -443,11 +446,11 @@ async def list_unban_(c, message: Message):
 # Delete messages
 
 
-@app.on_message(filters.command("del") & ~filters.private)
+@app.on_message((filters.command("del") | acmd(ar=["حذف", "احذف"])) & ~filters.private)
 @adminsOnly("can_delete_messages")
 async def deleteFunc(_, message: Message):
     if not message.reply_to_message:
-        return await message.reply_text("Reply To A Message To Delete It")
+        return await message.reply_text("ردّ على رسالة لحذفها.")
     await message.reply_to_message.delete()
     await message.delete()
 
@@ -455,20 +458,20 @@ async def deleteFunc(_, message: Message):
 # Promote Members
 
 
-@app.on_message(filters.command(["promote", "fullpromote"]) & ~filters.private)
+@app.on_message((filters.command(["promote", "fullpromote"]) | acmd(ar=["رفع", "ترقية", "رفع_كامل"])) & ~filters.private)
 @adminsOnly("can_promote_members")
 async def promoteFunc(_, message: Message):
     user_id = await extract_user(message)
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("لا أستطيع العثور على هذا المستخدم.")
 
     bot = (await app.get_chat_member(message.chat.id, BOT_ID)).privileges
     if user_id == BOT_ID:
-        return await message.reply_text("I can't promote myself.")
+        return await message.reply_text("لا أستطيع رفع نفسي.")
     if not bot:
-        return await message.reply_text("I'm not an admin in this chat.")
+        return await message.reply_text("أنا لست مشرفاً في هذه المجموعة.")
     if not bot.can_promote_members:
-        return await message.reply_text("I don't have enough permissions")
+        return await message.reply_text("ليس لديّ صلاحيات كافية")
 
     umention = (await app.get_users(user_id)).mention
 
@@ -486,7 +489,7 @@ async def promoteFunc(_, message: Message):
                 can_manage_video_chats=bot.can_manage_video_chats,
             ),
         )
-        return await message.reply_text(f"Fully Promoted! {umention}")
+        return await message.reply_text(f"Fully تمت الترقية! {umention}")
 
     await message.chat.promote_member(
         user_id=user_id,
@@ -501,23 +504,23 @@ async def promoteFunc(_, message: Message):
             can_manage_video_chats=bot.can_manage_video_chats,
         ),
     )
-    await message.reply_text(f"Promoted! {umention}")
+    await message.reply_text(f"تمت الترقية! {umention}")
 
 
 # Demote Member
 
 
-@app.on_message(filters.command("demote") & ~filters.private)
+@app.on_message((filters.command("demote") | acmd(ar=["تنزيل", "تخفيض"])) & ~filters.private)
 @adminsOnly("can_promote_members")
 async def demote(_, message: Message):
     user_id = await extract_user(message)
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("لا أستطيع العثور على هذا المستخدم.")
     if user_id == BOT_ID:
-        return await message.reply_text("I can't demote myself.")
+        return await message.reply_text("لا أستطيع تنزيل نفسي.")
     if user_id in SUDOERS:
         return await message.reply_text(
-            "You wanna demote the elevated one?, RECONSIDER!"
+            "هل تريد تنزيل مالك البوت؟ فكّر مرة أخرى!"
         )
     try:
         member = await app.get_chat_member(message.chat.id, user_id)
@@ -536,10 +539,10 @@ async def demote(_, message: Message):
                 ),
             )
             umention = (await app.get_users(user_id)).mention
-            await message.reply_text(f"Demoted! {umention}")
+            await message.reply_text(f"تم التنزيل! {umention}")
         else:
             await message.reply_text(
-                "The person you mentioned is not an admin."
+                "الشخص الذي ذكرته ليس مشرفاً."
             )
     except Exception as e:
         await message.reply_text(e)
@@ -548,11 +551,11 @@ async def demote(_, message: Message):
 # Pin Messages
 
 
-@app.on_message(filters.command(["pin", "unpin"]) & ~filters.private)
+@app.on_message((filters.command(["pin", "unpin"]) | acmd(ar=["تثبيت", "ثبت", "الغاء_تثبيت", "فك_تثبيت"])) & ~filters.private)
 @adminsOnly("can_pin_messages")
 async def pin(_, message: Message):
     if not message.reply_to_message:
-        return await message.reply_text("Reply to a message to pin/unpin it.")
+        return await message.reply_text("ردّ على رسالة لتثبيتها/إلغاء تثبيتها.")
     r = message.reply_to_message
     if message.command[0][0] == "u":
         await r.unpin()
@@ -573,36 +576,36 @@ async def pin(_, message: Message):
 # Mute members
 
 
-@app.on_message(filters.command(["mute", "tmute"]) & ~filters.private)
+@app.on_message((filters.command(["mute", "tmute"]) | acmd(ar=["كتم", "اكتم", "كتم_مؤقت"])) & ~filters.private)
 @adminsOnly("can_restrict_members")
 async def mute(_, message: Message):
     user_id, reason = await extract_user_and_reason(message)
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("لا أستطيع العثور على هذا المستخدم.")
     if user_id == BOT_ID:
-        return await message.reply_text("I can't mute myself.")
+        return await message.reply_text("لا أستطيع كتم نفسي.")
     if user_id in SUDOERS:
         return await message.reply_text(
-            "You wanna mute the elevated one?, RECONSIDER!"
+            "هل تريد كتم مالك البوت؟ فكّر مرة أخرى!"
         )
     if user_id in (await list_admins(message.chat.id)):
         return await message.reply_text(
-            "I can't mute an admin, You know the rules, so do i."
+            "لا أستطيع كتم مشرف، القوانين معروفة."
         )
     mention = (await app.get_users(user_id)).mention
     keyboard = ikb({"🚨  Unmute  🚨": f"unmute_{user_id}"})
     msg = (
-        f"**Muted User:** {mention}\n"
-        f"**Muted By:** {message.from_user.mention if message.from_user else 'Anon'}\n"
+        f"**المستخدم المكتوم:** {mention}\n"
+        f"**كُتم بواسطة:** {message.from_user.mention if message.from_user else 'مجهول'}\n"
     )
     if message.command[0] == "tmute":
         split = reason.split(None, 1)
         time_value = split[0]
         temp_reason = split[1] if len(split) > 1 else ""
         temp_mute = await time_converter(message, time_value)
-        msg += f"**Muted For:** {time_value}\n"
+        msg += f"**مدة الكتم:** {time_value}\n"
         if temp_reason:
-            msg += f"**Reason:** {temp_reason}"
+            msg += f"**السبب:** {temp_reason}"
         try:
             if len(time_value[:-1]) < 3:
                 await message.chat.restrict_member(
@@ -615,12 +618,12 @@ async def mute(_, message: Message):
                     message = replied_message
                 await message.reply_text(msg, reply_markup=keyboard)
             else:
-                await message.reply_text("You can't use more than 99")
+                await message.reply_text("لا يمكنك استخدام أكثر من 99")
         except AttributeError:
             pass
         return
     if reason:
-        msg += f"**Reason:** {reason}"
+        msg += f"**السبب:** {reason}"
     await message.chat.restrict_member(user_id, permissions=ChatPermissions())
     replied_message = message.reply_to_message
     if replied_message:
@@ -631,30 +634,30 @@ async def mute(_, message: Message):
 # Unmute members
 
 
-@app.on_message(filters.command("unmute") & ~filters.private)
+@app.on_message((filters.command("unmute") | acmd(ar=["الغاء_كتم", "فك_كتم"])) & ~filters.private)
 @adminsOnly("can_restrict_members")
 async def unmute(_, message: Message):
     user_id = await extract_user(message)
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("لا أستطيع العثور على هذا المستخدم.")
     await message.chat.unban_member(user_id)
     umention = (await app.get_users(user_id)).mention
     replied_message = message.reply_to_message
     if replied_message:
         message = replied_message
-    await message.reply_text(f"Unmuted! {umention}")
+    await message.reply_text(f"تم فك الكتم! {umention}")
 
 
 # Ban deleted accounts
 
 
-@app.on_message(filters.command("ban_ghosts") & ~filters.private)
+@app.on_message((filters.command("ban_ghosts") | acmd(ar=["حظر_المحذوفين"])) & ~filters.private)
 @adminsOnly("can_restrict_members")
 async def ban_deleted_accounts(_, message: Message):
     chat_id = message.chat.id
     deleted_users = []
     banned_users = 0
-    m = await message.reply("Finding ghosts...")
+    m = await message.reply("أبحث عن الحسابات المحذوفة...")
 
     async for i in app.get_chat_members(chat_id):
         if i.user.is_deleted:
@@ -666,29 +669,29 @@ async def ban_deleted_accounts(_, message: Message):
             except Exception:
                 pass
             banned_users += 1
-        await m.edit(f"Banned {banned_users} Deleted Accounts")
+        await m.edit(f"تم حظر {banned_users} حساباً محذوفاً")
     else:
-        await m.edit("There are no deleted accounts in this chat")
+        await m.edit("لا توجد حسابات محذوفة في هذه المجموعة")
 
 
-@app.on_message(filters.command(["warn", "dwarn"]) & ~filters.private)
+@app.on_message((filters.command(["warn", "dwarn"]) | acmd(ar=["تحذير", "حذر", "حذف_تحذير"])) & ~filters.private)
 @adminsOnly("can_restrict_members")
 async def warn_user(_, message: Message):
     user_id, reason = await extract_user_and_reason(message)
     chat_id = message.chat.id
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("لا أستطيع العثور على هذا المستخدم.")
     if user_id == BOT_ID:
         return await message.reply_text(
-            "I can't warn myself, i can leave if you want."
+            "لا أستطيع تحذير نفسي."
         )
     if user_id in SUDOERS:
         return await message.reply_text(
-            "You Wanna Warn The Elevated One?, RECONSIDER!"
+            "هل تريد تحذير مالك البوت؟ فكّر مرة أخرى!"
         )
     if user_id in (await list_admins(chat_id)):
         return await message.reply_text(
-            "I can't warn an admin, You know the rules, so do i."
+            "لا أستطيع تحذير مشرف، القوانين معروفة."
         )
     user, warns = await asyncio.gather(
         app.get_users(user_id),
@@ -705,16 +708,16 @@ async def warn_user(_, message: Message):
     if warns >= 2:
         await message.chat.ban_member(user_id)
         await message.reply_text(
-            f"Number of warns of {mention} exceeded, BANNED!"
+            f"تجاوز {mention} الحد المسموح من التحذيرات، تم حظره!"
         )
         await remove_warns(chat_id, await int_to_alpha(user_id))
     else:
         warn = {"warns": warns + 1}
         msg = f"""
-**Warned User:** {mention}
-**Warned By:** {message.from_user.mention if message.from_user else 'Anon'}
-**Reason:** {reason or 'No Reason Provided.'}
-**Warns:** {warns + 1}/3"""
+**المستخدم المحذّر:** {mention}
+**حُذّر بواسطة:** {message.from_user.mention if message.from_user else 'مجهول'}
+**السبب:** {reason or 'لم يُذكر سبب.'}
+**التحذيرات:** {warns + 1}/3"""
         replied_message = message.reply_to_message
         if replied_message:
             message = replied_message
@@ -730,8 +733,8 @@ async def remove_warning(_, cq: CallbackQuery):
     permission = "can_restrict_members"
     if permission not in permissions:
         return await cq.answer(
-            "You don't have enough permissions to perform this action.\n"
-            + f"Permission needed: {permission}",
+            "ليس لديك صلاحيات كافية للقيام بهذا الإجراء.\n"
+            + f"الصلاحية المطلوبة: {permission}",
             show_alert=True,
         )
     user_id = cq.data.split("_")[1]
@@ -739,7 +742,7 @@ async def remove_warning(_, cq: CallbackQuery):
     if warns:
         warns = warns["warns"]
     if not warns or warns == 0:
-        return await cq.answer("User has no warnings.")
+        return await cq.answer("المستخدم لا يملك أي تحذيرات.")
     warn = {"warns": warns - 1}
     await add_warn(chat_id, await int_to_alpha(user_id), warn)
     text = cq.message.text.markdown
@@ -751,12 +754,12 @@ async def remove_warning(_, cq: CallbackQuery):
 # Rmwarns
 
 
-@app.on_message(filters.command("rmwarns") & ~filters.private)
+@app.on_message((filters.command("rmwarns") | acmd(ar=["مسح_التحذيرات"])) & ~filters.private)
 @adminsOnly("can_restrict_members")
 async def remove_warnings(_, message: Message):
     if not message.reply_to_message:
         return await message.reply_text(
-            "Reply to a message to remove a user's warnings."
+            "ردّ على رسالة لإزالة تحذيرات المستخدم."
         )
     user_id = message.reply_to_message.from_user.id
     mention = message.reply_to_message.from_user.mention
@@ -768,18 +771,18 @@ async def remove_warnings(_, message: Message):
         await message.reply_text(f"{mention} have no warnings.")
     else:
         await remove_warns(chat_id, await int_to_alpha(user_id))
-        await message.reply_text(f"Removed warnings of {mention}.")
+        await message.reply_text(f"تم مسح تحذيرات {mention}.")
 
 
 # Warns
 
 
-@app.on_message(filters.command("warns") & ~filters.private)
+@app.on_message((filters.command("warns") | acmd(ar=["تحذيرات", "تحذيراتي"])) & ~filters.private)
 @capture_err
 async def check_warns(_, message: Message):
     user_id = await extract_user(message)
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("لا أستطيع العثور على هذا المستخدم.")
     warns = await get_warn(message.chat.id, await int_to_alpha(user_id))
     mention = (await app.get_users(user_id)).mention
     if warns:
@@ -794,7 +797,7 @@ async def check_warns(_, message: Message):
 
 @app.on_message(
     (
-        filters.command("report")
+        (filters.command("report") | acmd(ar=["بلاغ", "ابلاغ"]))
         | filters.command(["admins", "admin"], prefixes="@")
     )
     & ~filters.private
@@ -803,7 +806,7 @@ async def check_warns(_, message: Message):
 async def report_user(_, message):
     if len(message.text.split()) <= 1 and not message.reply_to_message:
         return await message.reply_text(
-            "Reply to a message to report that user."
+            "ردّ على رسالة للإبلاغ عن المستخدم."
         )
 
     reply = message.reply_to_message if message.reply_to_message else message
@@ -821,18 +824,18 @@ async def report_user(_, message):
             or reply_id == linked_chat.id
         ):
             return await message.reply_text(
-                "Do you know that the user you are replying is an admin ?"
+                "المستخدم الذي تردّ عليه مشرف!"
             )
     else:
         if reply_id in list_of_admins or reply_id == message.chat.id:
             return await message.reply_text(
-                "Do you know that the user you are replying is an admin ?"
+                "المستخدم الذي تردّ عليه مشرف!"
             )
 
     user_mention = (
         reply.from_user.mention if reply.from_user else reply.sender_chat.title
     )
-    text = f"Reported {user_mention} to admins!."
+    text = f"تم الإبلاغ عن {user_mention} للمشرفين!"
     admin_data = [
         i
         async for i in app.get_chat_members(
@@ -848,14 +851,14 @@ async def report_user(_, message):
     await reply.reply_text(text)
 
 
-@app.on_message(filters.command("invite"))
+@app.on_message((filters.command("invite") | acmd(ar=["رابط", "رابط_الدعوة"])))
 @adminsOnly("can_invite_users")
 async def invite(_, message):
     if message.chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
         link = (await app.get_chat(message.chat.id)).invite_link
         if not link:
             link = await app.export_chat_invite_link(message.chat.id)
-        text = f"Here's This Group's Invite Link.\n\n{link}"
+        text = f"إليك رابط دعوة هذه المجموعة.\n\n{link}"
         if message.reply_to_message:
             await message.reply_to_message.reply_text(
                 text, disable_web_page_preview=True

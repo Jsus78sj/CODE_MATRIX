@@ -25,6 +25,7 @@ from asyncio import gather, sleep
 
 from pyrogram import enums, filters
 from pyrogram.types import Message
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import (
     BOT_ID,
@@ -41,12 +42,9 @@ from wbb.core.decorators.errors import capture_err
 from wbb.utils.dbfunctions import add_chatbot, check_chatbot, rm_chatbot
 from wbb.utils.filter_groups import chatbot_group
 
-__MODULE__ = "ChatBot"
-__HELP__ = """
-/chatbot [ENABLE|DISABLE] To Enable Or Disable ChatBot In Your Chat.
-
-There's one module of this available for userbot also
-check userbot module help."""
+__MODULE__ = "المحادثة الذكية"
+__HELP__ = """/chatbot [on/off] - تفعيل أو تعطيل المحادثة الذكية في المجموعة.
+🔸 العربية: محادثة [تشغيل/ايقاف]"""
 
 
 async def chat_bot_toggle(message: Message, is_userbot: bool):
@@ -72,7 +70,7 @@ async def chat_bot_toggle(message: Message, is_userbot: bool):
 # Enabled | Disable Chatbot
 
 
-@app.on_message(filters.command("chatbot"))
+@app.on_message((filters.command("chatbot") | acmd(ar=["محادثة", "محادثة_ذكية"])))
 @capture_err
 async def chatbot_status(_, message: Message):
     if len(message.command) != 2:

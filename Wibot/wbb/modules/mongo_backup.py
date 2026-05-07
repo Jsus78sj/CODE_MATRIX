@@ -26,11 +26,12 @@ from os import system as execute
 
 from pyrogram import enums, filters
 from pyrogram.types import Message
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import MONGO_URL, SUDOERS, app
 
 
-@app.on_message(filters.command("backup") & SUDOERS)
+@app.on_message((filters.command("backup") | acmd(ar=["نسخ_احتياطي"])) & SUDOERS)
 async def backup(_, message: Message):
     if message.chat.type != enums.ChatType.PRIVATE:
         return await message.reply("This command can only be used in private")

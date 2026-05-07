@@ -1,4 +1,5 @@
 from pyrogram import filters
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import app
 from wbb.core.decorators.errors import capture_err
@@ -6,14 +7,12 @@ from wbb.core.keyboard import ikb
 from wbb.core.sections import section
 from wbb.utils.http import get
 
-__MODULE__ = "Crypto"
-__HELP__ = """
-/crypto [currency]
-        Get Real Time value from currency given.
-"""
+__MODULE__ = "العملات الرقمية"
+__HELP__ = """/crypto [العملة] - الحصول على سعر عملة رقمية.
+🔸 العربية: عملة [BTC/ETH/...]"""
 
 
-@app.on_message(filters.command("crypto"))
+@app.on_message((filters.command("crypto") | acmd(ar=["عملة"])))
 @capture_err
 async def crypto(_, message):
     if len(message.command) < 2:

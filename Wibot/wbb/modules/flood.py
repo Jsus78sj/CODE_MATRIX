@@ -40,12 +40,12 @@ from wbb.modules.admin import list_admins, member_permissions
 from wbb.utils.dbfunctions import flood_off, flood_on, is_flood_on
 from wbb.utils.filter_groups import flood_group
 
-__MODULE__ = "Flood"
-__HELP__ = """
-Anti-Flood system, the one who sends more than 10 messages in a row, gets muted for an hour (Except for admins).
-
-/flood [ENABLE|DISABLE] - Turn flood detection on or off
-"""
+__MODULE__ = "الإغراق"
+__HELP__ = """/setflood [n] - ضبط حد الإغراق (عدد الرسائل المتتالية).
+/setflood off - تعطيل الميزة.
+/flood - عرض إعدادات الإغراق.
+/floodmode [mute/kick/ban] - تحديد التصرف عند تجاوز الحد.
+🔸 العربية: اغراق، تشغيل_الاغراق، ايقاف_الاغراق"""
 
 DB = {}  # TODO Use mongodb instead of a fucking dict.
 
@@ -138,8 +138,8 @@ async def flood_callback_func(_, cq: CallbackQuery):
     permission = "can_restrict_members"
     if permission not in permissions:
         return await cq.answer(
-            "You don't have enough permissions to perform this action.\n"
-            + f"Permission needed: {permission}",
+            "ليس لديك صلاحيات كافية للقيام بهذا الإجراء.\n"
+            + f"الصلاحية المطلوبة: {permission}",
             show_alert=True,
         )
     user_id = cq.data.split("_")[1]

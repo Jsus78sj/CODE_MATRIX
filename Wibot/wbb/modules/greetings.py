@@ -69,38 +69,15 @@ from wbb.utils.functions import (
     extract_text_and_keyb,
     generate_captcha,
 )
+from wbb.utils.acmd import cmd as acmd
 
-__MODULE__ = "Greetings"
-__HELP__ = """
-/captcha [ENABLE|DISABLE] - Enable/Disable captcha.
-
-/set_welcome - Reply this to a message containing correct
-format for a welcome message, check end of this message.
-
-/del_welcome - Delete the welcome message.
-/get_welcome - Get the welcome message.
-
-**SET_WELCOME ->**
-
-**To set a photo or gif as welcome message. Add your welcome message as caption to the photo or gif. The caption muse be in the format given below.**
-
-For text welcome message just send the text. Then reply with the command 
-
-The format should be something like below.
-
-```
-**Hi** {name} [{id}] Welcome to {chat}
-
-~ #This separater (~) should be there between text and buttons, remove this comment also
-
-button=[Duck, https://duckduckgo.com]
-button2=[Github, https://github.com]
-```
-
-**NOTES ->**
-
-Checkout /markdownhelp to know more about formattings and other syntax.
-"""
+__MODULE__ = "الترحيب والوداع"
+__HELP__ = """/welcome [on/off] - تفعيل/تعطيل رسائل الترحيب.
+/setwelcome - تخصيص رسالة الترحيب (رد على الرسالة).
+/goodbye [on/off] - تفعيل/تعطيل رسائل الوداع.
+/setgoodbye - تخصيص رسالة الوداع.
+/captcha [on/off] - تفعيل التحقق ضد البوتات.
+🔸 العربية: ترحيب، وداع، كابتشا"""
 
 answers_dicc = []
 loop = asyncio.get_running_loop()
@@ -159,7 +136,7 @@ async def handle_new_member(member, chat):
 
         await chat.restrict_member(member.id, ChatPermissions())
         text = (
-            f"{(member.mention())} Are you human?\n"
+            f"{(member.mention())} هل أنت إنسان؟\n"
             f"Solve this captcha in {WELCOME_DELAY_KICK_SEC} "
             "seconds and 4 attempts or you'll be kicked."
         )
@@ -324,10 +301,10 @@ async def callback_query_welcome_button(_, callback_query):
         )
 
     if pending_user_id != pressed_user_id:
-        return await callback_query.answer("This is not for you")
+        return await callback_query.answer("هذه ليست لك")
 
     if answer != correct_answer:
-        await callback_query.answer("Yeah, It's Wrong.")
+        await callback_query.answer("إجابة خاطئة.")
         for iii in answers_dicc:
             if (
                 iii["user_id"] == pending_user_id
@@ -355,7 +332,7 @@ async def callback_query_welcome_button(_, callback_query):
             reply_markup=keyboard,
         )
 
-    await callback_query.answer("Captcha passed successfully!")
+    await callback_query.answer("تم اجتياز الكابتشا بنجاح!")
     await button_message.chat.unban_member(pending_user_id)
     await button_message.delete()
 
@@ -408,7 +385,7 @@ async def _ban_restricted_user_until_date(
         pass
 
 
-@app.on_message(filters.command("captcha") & ~filters.private)
+@app.on_message((filters.command("captcha") | acmd(ar=["كابتشا"])) & ~filters.private)
 @adminsOnly("can_restrict_members")
 async def captcha_state(_, message):
     usage = "**Usage:**\n/captcha [ENABLE|DISABLE]"
@@ -420,10 +397,10 @@ async def captcha_state(_, message):
     state = state.lower()
     if state == "enable":
         await captcha_on(chat_id)
-        await message.reply_text("Enabled Captcha For New Users.")
+        await message.reply_text("تم تفعيل الكابتشا للأعضاء الجدد.")
     elif state == "disable":
         await captcha_off(chat_id)
-        await message.reply_text("Disabled Captcha For New Users.")
+        await message.reply_text("تم تعطيل الكابتشا للأعضاء الجدد.")
     else:
         await message.reply_text(usage)
 
@@ -439,7 +416,7 @@ async def set_welcome_func(_, message):
         [
             [
                 InlineKeyboardButton(
-                    text="More Help",
+                    text="مساعدة إضافية",
                     url=f"t.me/{BOT_USERNAME}?start=help_greetings",
                 )
             ],
@@ -481,7 +458,7 @@ async def set_welcome_func(_, message):
         if raw_text:
             await set_welcome(chat_id, welcome, raw_text, file_id)
             return await message.reply_text(
-                "Welcome message has been successfully set."
+                "تم حفظ رسالة الترحيب بنجاح."
             )
         else:
             return await message.reply_text(
@@ -499,7 +476,7 @@ async def set_welcome_func(_, message):
 async def del_welcome_func(_, message):
     chat_id = message.chat.id
     await del_welcome(chat_id)
-    await message.reply_text("Welcome message has been deleted.")
+    await message.reply_text("تم حذف رسالة الترحيب.")
 
 
 @app.on_message(filters.command("get_welcome") & ~filters.private)
@@ -508,7 +485,7 @@ async def get_welcome_func(_, message):
     chat = message.chat
     welcome, raw_text, file_id = await get_welcome(chat.id)
     if not raw_text:
-        return await message.reply_text("No welcome message set.")
+        return await message.reply_text("لا توجد رسالة ترحيب محفوظة.")
     if not message.from_user:
         return await message.reply_text(
             "You're anon, can't send welcome message."

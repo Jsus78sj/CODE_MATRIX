@@ -3,11 +3,14 @@ from pyrogram.types import Message
 
 from wbb import SUDOERS, USERBOT_PREFIX, app, app2
 
-__MODULE__ = "Dice"
-__HELP__ = """
-/dice
-    Roll a dice.
-"""
+__MODULE__ = "النرد"
+__HELP__ = """/dice - رمي نرد.
+/dart - رمي سهم.
+/basket - رمي كرة سلة.
+/foot - رمي كرة قدم.
+/bowl - رمي بولينغ.
+/slot - تشغيل مكنة الحظ.
+🔸 العربية: نرد، سهم، سلة، كرة، بولينغ، حظ"""
 
 
 @app2.on_message(

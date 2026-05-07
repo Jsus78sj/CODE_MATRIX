@@ -32,6 +32,7 @@ import requests
 from bs4 import BeautifulSoup
 from pyrogram import filters
 from pyrogram.types import InputMediaPhoto, Message
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import MESSAGE_DUMP_CHAT, SUDOERS, USERBOT_PREFIX, app, app2, eor
 from wbb.core.decorators.errors import capture_err
@@ -50,7 +51,7 @@ async def get_soup(url: str, headers):
     & ~filters.via_bot
     & SUDOERS
 )
-@app.on_message(filters.command("reverse"))
+@app.on_message((filters.command("reverse") | acmd(ar=["بحث_عكسي"])))
 @capture_err
 async def reverse_image_search(client, message: Message):
     if not message.reply_to_message:

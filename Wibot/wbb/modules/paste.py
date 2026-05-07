@@ -27,14 +27,16 @@ import re
 import aiofiles
 from pyrogram import filters
 from pyrogram.types import Message
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import SUDOERS, USERBOT_PREFIX, app, app2, eor
 from wbb.core.decorators.errors import capture_err
 from wbb.core.keyboard import ikb
 from wbb.utils.pastebin import paste
 
-__MODULE__ = "Paste"
-__HELP__ = "/paste - To Paste Replied Text Or Document To A Pastebin"
+__MODULE__ = "لصق النصوص"
+__HELP__ = """/paste - لصق نص أو محتوى ملف إلى pastebin.
+🔸 العربية: لصق"""
 pattern = re.compile(r"^text/|json$|yaml$|xml$|toml$|x-sh$|x-shellscript$")
 
 
@@ -44,7 +46,7 @@ pattern = re.compile(r"^text/|json$|yaml$|xml$|toml$|x-sh$|x-shellscript$")
     & ~filters.via_bot
     & SUDOERS
 )
-@app.on_message(filters.command("paste"))
+@app.on_message((filters.command("paste") | acmd(ar=["لصق"])))
 @capture_err
 async def paste_func(_, message: Message):
     if not message.reply_to_message:

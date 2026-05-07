@@ -25,16 +25,16 @@ import os
 
 from pyrogram import filters
 from pyrogram.types import Message
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import SUDOERS, app
 from wbb.core.sections import section
 from wbb.utils.dbfunctions import is_gbanned_user, user_global_karma
 
-__MODULE__ = "Info"
-__HELP__ = """
-/info [USERNAME|ID] - Get info about a user.
-/chat_info [USERNAME|ID] - Get info about a chat.
-"""
+__MODULE__ = "المعلومات"
+__HELP__ = """/info - عرض معلومات المستخدم (بالرد على رسالته أو بكتابة معرّفه).
+/id - عرض معرف المستخدم/المجموعة.
+🔸 العربية: معلومات، الايدي، ايدي"""
 
 
 async def get_user_info(user, already=False):
@@ -97,7 +97,7 @@ async def get_chat_info(chat, already=False):
     return [caption, photo_id]
 
 
-@app.on_message(filters.command("info"))
+@app.on_message((filters.command("info") | acmd(ar=["معلومات", "معلومه"])))
 async def info_func(_, message: Message):
     if message.reply_to_message:
         user = message.reply_to_message.from_user.id

@@ -28,20 +28,11 @@ from wbb import BOT_ID, SUDOERS, USERBOT_PREFIX, app2, eor
 from wbb.core.decorators.errors import capture_err
 from wbb.utils.dbfunctions import add_sudo, get_sudoers, remove_sudo
 
-__MODULE__ = "Sudo"
-__HELP__ = """
-**THIS MODULE IS ONLY FOR DEVS**
-
-.useradd - To Add A User In Sudoers.
-.userdel - To Remove A User From Sudoers.
-.sudoers - To List Sudo Users.
-
-**NOTE:**
-
-Never add anyone to sudoers unless you trust them,
-sudo users can do anything with your account, they
-can even delete your account.
-"""
+__MODULE__ = "السودو"
+__HELP__ = """/addsudo - إضافة مستخدم كسودو.
+/rmsudo - إزالة مستخدم من السودو.
+/sudoers - عرض قائمة السودو.
+🔸 السودو فقط."""
 
 
 @app2.on_message(

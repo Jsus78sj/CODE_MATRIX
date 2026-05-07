@@ -38,25 +38,17 @@ from wbb.core.decorators.permissions import adminsOnly
 from wbb.core.keyboard import ikb
 from wbb.modules.admin import member_permissions
 from wbb.modules.greetings import handle_new_member, send_welcome_message
+from wbb.utils.acmd import cmd as acmd
 
 approvaldb = db.autoapprove
 
-__MODULE__ = "Autoapprove"
-__HELP__ = """
-command: /autoapprove
-
-This module helps to automatically accept chat join request send by a user through invitation link of your group
-
-**Modes:**
-¤ Automatic - Automatically accepts chat join request.
-
-¤ Manual - A message will be send to the chat by tagging the admins. The admins can accept or decline the requests.
-
-Use: /clear_pending Command to remove all pending user ID from DB. This will allow the user to send request again.
-"""
+__MODULE__ = "القبول التلقائي"
+__HELP__ = """/autoapprove [on/off] - تفعيل القبول التلقائي لطلبات الانضمام.
+/approveall - قبول جميع الطلبات المعلقة دفعة واحدة.
+🔸 العربية: قبول_تلقائي، قبول_الكل"""
 
 
-@app.on_message(filters.command("autoapprove") & filters.group)
+@app.on_message((filters.command("autoapprove") | acmd(ar=["قبول_تلقائي"])) & filters.group)
 @adminsOnly("can_change_info")
 async def approval_command(client, message):
     chat_id = message.chat.id

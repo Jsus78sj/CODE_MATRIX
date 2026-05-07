@@ -24,19 +24,19 @@ SOFTWARE.
 import os
 
 from pyrogram import filters
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import app
 from wbb.core.decorators.permissions import adminsOnly
 
-__MODULE__ = "Admin Miscs"
-__HELP__ = """
-/set_chat_title - Change The Name Of A Group/Channel.
-/set_chat_photo - Change The PFP Of A Group/Channel.
-/set_user_title - Change The Administrator Title Of An Admin.
-"""
+__MODULE__ = "إدارة متفرقة"
+__HELP__ = """/set_chat_title - تغيير اسم المجموعة/القناة
+/set_chat_photo - تغيير صورة المجموعة/القناة
+/set_user_title - تغيير لقب المشرف
+🔸 العربية: غير_العنوان، غير_الصورة، غير_اللقب"""
 
 
-@app.on_message(filters.command("set_chat_title") & ~filters.private)
+@app.on_message((filters.command("set_chat_title") | acmd(ar=["غير_العنوان"])) & ~filters.private)
 @adminsOnly("can_change_info")
 async def set_chat_title(_, message):
     if len(message.command) < 2:
@@ -49,7 +49,7 @@ async def set_chat_title(_, message):
     )
 
 
-@app.on_message(filters.command("set_user_title") & ~filters.private)
+@app.on_message((filters.command("set_user_title") | acmd(ar=["غير_اللقب"])) & ~filters.private)
 @adminsOnly("can_change_info")
 async def set_user_title(_, message):
     if not message.reply_to_message:
@@ -73,7 +73,7 @@ async def set_user_title(_, message):
     )
 
 
-@app.on_message(filters.command("set_chat_photo") & ~filters.private)
+@app.on_message((filters.command("set_chat_photo") | acmd(ar=["غير_الصورة"])) & ~filters.private)
 @adminsOnly("can_change_info")
 async def set_chat_photo(_, message):
     reply = message.reply_to_message

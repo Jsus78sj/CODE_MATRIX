@@ -26,6 +26,7 @@ from datetime import datetime, timedelta
 
 from pyrogram import filters
 from pyrogram.types import ChatPermissions
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import SUDOERS, app
 from wbb.core.decorators.errors import capture_err
@@ -38,15 +39,15 @@ from wbb.utils.dbfunctions import (
 )
 from wbb.utils.filter_groups import blacklist_filters_group
 
-__MODULE__ = "Blacklist"
-__HELP__ = """
-/blacklisted - Get All The Blacklisted Words In The Chat.
-/blacklist [WORD|SENTENCE] - Blacklist A Word Or A Sentence.
-/whitelist [WORD|SENTENCE] - Whitelist A Word Or A Sentence.
-"""
+__MODULE__ = "القائمة السوداء"
+__HELP__ = """/addblacklist [نص] - إضافة كلمة للقائمة السوداء.
+/blacklist - عرض القائمة السوداء.
+/rmblacklist - حذف كلمة من القائمة السوداء.
+/blacklistmode [del/warn/ban/kick/mute] - تحديد التصرف عند المخالفة.
+🔸 العربية: قائمة_سوداء، اضف_كلمة، احذف_كلمة، وضع_القائمة"""
 
 
-@app.on_message(filters.command("blacklist") & ~filters.private)
+@app.on_message((filters.command("blacklist") | acmd(ar=["قائمة_سوداء"])) & ~filters.private)
 @adminsOnly("can_restrict_members")
 async def save_filters(_, message):
     if len(message.command) < 2:

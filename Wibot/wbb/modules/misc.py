@@ -30,68 +30,21 @@ from asyncio import Lock
 from re import findall
 
 from pyrogram import enums, filters
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import SUDOERS, USERBOT_PREFIX, app, app2, arq, eor
 from wbb.core.decorators.errors import capture_err
 from wbb.utils import random_line
 from wbb.utils.http import get
 
-__MODULE__ = "Misc"
-__HELP__ = """
-/asq
-    Ask a question
-
-/commit
-    Generate Funny Commit Messages
-
-/runs
-    Idk Test Yourself
-
-/id
-    Get Chat_ID or User_ID
-
-/random [Length]
-    Generate Random Complex Passwords
-
-/cheat [Language] [Query]
-    Get Programming Related Help
-
-/tr [LANGUAGE_CODE]
-    Translate A Message
-    Ex: /tr en
-
-/arq
-    Statistics Of ARQ API.
-
-/webss | .webss [URL] [FULL_SIZE?, use (y|yes|true) to get full size image. (optional)]
-    Take A Screenshot Of A Webpage
-
-/reverse
-    Reverse search an image.
-
-/carbon
-    Make Carbon from code.
-
-/tts
-    Convert Text To Speech.
-
-/autocorrect [Reply to a message]
-    Autocorrects the text in replied message.
-
-/pdf [Reply to an image (as document) or a group of images.]
-    Convert images to PDF, helpful for online classes.
-
-/markdownhelp
-    Sends mark down and formatting help.
-
-/backup
-    Backup database
-
-/ping
-    Check ping of all 5 DCs.
-    
-#RTFM - Tell noobs to read the manual
-"""
+__MODULE__ = "أوامر متفرقة"
+__HELP__ = """/paste - رفع نص أو ملف إلى موقع لصق.
+/google [بحث] - بحث في جوجل.
+/translate [اللغة] - ترجمة النص (بالرد على رسالة).
+/tr [اللغة] - مختصر الترجمة.
+/cash - تحويل العملات.
+/wiki - بحث في ويكيبيديا.
+🔸 العربية: ترجم، جوجل، ويكي، تحويل_عملة"""
 
 ASQ_LOCK = Lock()
 PING_LOCK = Lock()
@@ -103,7 +56,7 @@ PING_LOCK = Lock()
     & ~filters.forwarded
     & ~filters.via_bot
 )
-@app.on_message(filters.command("ping"))
+@app.on_message((filters.command("ping") | acmd(ar=["بنق", "سرعة"])))
 async def ping_handler(_, message):
     m = await eor(message, text="Pinging datacenters...")
     async with PING_LOCK:
@@ -176,7 +129,7 @@ async def runs(_, message):
     & ~filters.via_bot
     & SUDOERS
 )
-@app.on_message(filters.command("id"))
+@app.on_message((filters.command("id") | acmd(ar=["الايدي", "ايدي", "معرف"])))
 async def getid(client, message):
     chat = message.chat
     your_id = message.from_user.id
@@ -232,7 +185,7 @@ async def random(_, message):
 
 
 # Translate
-@app.on_message(filters.command("tr"))
+@app.on_message((filters.command("tr") | acmd(ar=["ترجمة"])))
 @capture_err
 async def tr(_, message):
     if len(message.command) != 2:

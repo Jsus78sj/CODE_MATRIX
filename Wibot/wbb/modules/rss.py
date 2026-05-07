@@ -26,16 +26,11 @@ from wbb.utils.functions import (
 )
 from wbb.utils.rss import Feed
 
-__MODULE__ = "RSS"
-__HELP__ = f"""
-/add_feed [URL] - Add a feed to chat
-/rm_feed - Remove feed from chat
-
-**Note:**
-    - This will check for updates every {RSS_DELAY // 60} minutes.
-    - You can only add one feed per chat.
-    - Currently RSS and ATOM feeds are supported.
-"""
+__MODULE__ = "تغذية RSS"
+__HELP__ = """/addfeed [الرابط] - إضافة تغذية RSS.
+/listfeeds - عرض التغذيات المضافة.
+/delfeed [الرابط] - حذف تغذية.
+🔸 العربية: اضف_تغذية، تغذيات، احذف_تغذية"""
 
 
 def get_parsed_feed_url(parsed, fallback: str) -> str:

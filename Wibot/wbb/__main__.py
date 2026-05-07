@@ -48,6 +48,7 @@ from wbb.utils import paginate_modules
 from wbb.utils.constants import MARKDOWN
 from wbb.utils.dbfunctions import clean_restart_stage, get_rules
 from wbb.utils.functions import extract_text_and_keyb
+from wbb.utils.acmd import cmd as acmd
 
 HELPABLE = {}
 
@@ -94,11 +95,11 @@ async def start_bot():
             await app.edit_message_text(
                 restart_data["chat_id"],
                 restart_data["message_id"],
-                "**Restarted Successfully**",
+                "**تمت إعادة التشغيل بنجاح ✅**",
             )
 
         else:
-            await app.send_message(LOG_GROUP_ID, "Bot started!")
+            await app.send_message(LOG_GROUP_ID, "البوت يعمل الآن! ✅")
     except Exception:
         pass
 
@@ -120,25 +121,25 @@ home_keyboard_pm = InlineKeyboardMarkup(
     [
         [
             InlineKeyboardButton(
-                text="Commands ❓", callback_data="bot_commands"
+                text="الأوامر ❓", callback_data="bot_commands"
             ),
             InlineKeyboardButton(
-                text="Repo 🛠",
+                text="المستودع 🛠",
                 url="https://github.com/thehamkercat/WilliamButcherBot",
             ),
         ],
         [
             InlineKeyboardButton(
-                text="System Stats 🖥",
+                text="إحصائيات النظام 🖥",
                 callback_data="stats_callback",
             ),
             InlineKeyboardButton(
-                text="Support 👨", url="http://t.me/WBBSupport"
+                text="الدعم 👨", url="http://t.me/WBBSupport"
             ),
         ],
         [
             InlineKeyboardButton(
-                text="Add Me To Your Group 🎉",
+                text="أضفني إلى مجموعتك 🎉",
                 url=f"http://t.me/{BOT_USERNAME}?startgroup=new",
             )
         ],
@@ -146,29 +147,29 @@ home_keyboard_pm = InlineKeyboardMarkup(
 )
 
 home_text_pm = (
-    f"Hey there! My name is {BOT_NAME}. I can manage your "
-    + "group with lots of useful features, feel free to "
-    + "add me to your group."
+    f"مرحباً! أنا {BOT_NAME} 🤖\n"
+    + "بوت إدارة مجموعات تيليجرام بميزات كثيرة ومفيدة.\n"
+    + "أضفني إلى مجموعتك واجعلني مشرفاً لأبدأ العمل."
 )
 
 keyboard = InlineKeyboardMarkup(
     [
         [
             InlineKeyboardButton(
-                text="Help ❓",
+                text="المساعدة ❓",
                 url=f"t.me/{BOT_USERNAME}?start=help",
             ),
             InlineKeyboardButton(
-                text="Repo 🛠",
+                text="المستودع 🛠",
                 url="https://github.com/thehamkercat/WilliamButcherBot",
             ),
         ],
         [
             InlineKeyboardButton(
-                text="System Stats 💻",
+                text="إحصائيات النظام 💻",
                 callback_data="stats_callback",
             ),
-            InlineKeyboardButton(text="Support 👨", url="t.me/WBBSupport"),
+            InlineKeyboardButton(text="الدعم 👨", url="t.me/WBBSupport"),
         ],
     ]
 )
@@ -178,27 +179,27 @@ FED_MARKUP = InlineKeyboardMarkup(
     [
         [
             InlineKeyboardButton(
-                "Fed Owner Commands", callback_data="fed_owner"
+                "أوامر مالك الاتحاد", callback_data="fed_owner"
             ),
             InlineKeyboardButton(
-                "Fed Admin Commands", callback_data="fed_admin"
+                "أوامر مشرفي الاتحاد", callback_data="fed_admin"
             ),
         ],
         [
-            InlineKeyboardButton("User Commands", callback_data="fed_user"),
+            InlineKeyboardButton("أوامر المستخدمين", callback_data="fed_user"),
         ],
         [
-            InlineKeyboardButton("Back", callback_data="help_back"),
+            InlineKeyboardButton("رجوع", callback_data="help_back"),
         ],
     ]
 )
 
 
-@app.on_message(filters.command("start"))
+@app.on_message(filters.command("start") | acmd(ar=["بدء", "ابدا", "ابدأ", "بداية"]))
 async def start(_, message):
     if message.chat.type != ChatType.PRIVATE:
         return await message.reply(
-            "Pm Me For More Details.", reply_markup=keyboard
+            "راسلني في الخاص لمزيد من التفاصيل.", reply_markup=keyboard
         )
     if len(message.text.split()) > 1:
         user = await app.get_users(message.from_user.id)
@@ -208,7 +209,7 @@ async def start(_, message):
             chat_id = match.group(1)
             user_id = message.from_user.id
             chat = await app.get_chat(int(chat_id))
-            text = f"**The rules for `{chat.title}` are:\n\n**"
+            text = f"**قوانين مجموعة `{chat.title}`:\n\n**"
             rules = await get_rules(int(chat_id))
             if rules:
                 text = text + rules
@@ -223,8 +224,8 @@ async def start(_, message):
             else:
                 return await app.send_message(
                     user_id,
-                    "The group admins haven't set any rules for this chat yet. "
-                    "This probably doesn't mean it's lawless though...!",
+                    "لم يضع مشرفو المجموعة أي قوانين بعد. "
+                    "هذا لا يعني بالضرورة أنها مجموعة بلا قوانين... 😉",
                 )
         if name == "mkdwn_help":
             await message.reply(
@@ -235,7 +236,7 @@ async def start(_, message):
         elif "_" in name:
             module = name.split("_", 1)[1]
             text = (
-                f"Here is the help for **{HELPABLE[module].__MODULE__}**:\n"
+                f"إليك المساعدة لقسم **{HELPABLE[module].__MODULE__}**:\n"
                 + HELPABLE[module].__HELP__
             )
             if module == "federation":
@@ -247,7 +248,7 @@ async def start(_, message):
             await message.reply(
                 text,
                 reply_markup=InlineKeyboardMarkup(
-                    [[InlineKeyboardButton("back", callback_data="help_back")]]
+                    [[InlineKeyboardButton("رجوع", callback_data="help_back")]]
                 ),
                 disable_web_page_preview=True,
             )
@@ -265,7 +266,7 @@ async def start(_, message):
     return
 
 
-@app.on_message(filters.command("help"))
+@app.on_message(filters.command("help") | acmd(ar=["مساعدة", "المساعدة", "اوامر", "الاوامر"]))
 async def help_command(_, message):
     if message.chat.type != ChatType.PRIVATE:
         if len(message.command) >= 2:
@@ -275,30 +276,30 @@ async def help_command(_, message):
                     [
                         [
                             InlineKeyboardButton(
-                                text="Click here",
+                                text="اضغط هنا",
                                 url=f"t.me/{BOT_USERNAME}?start=help_{name}",
                             )
                         ],
                     ]
                 )
                 await message.reply(
-                    f"Click on the below button to get help about {name}",
+                    f"اضغط على الزر أدناه للحصول على مساعدة حول {name}",
                     reply_markup=key,
                 )
             else:
                 await message.reply(
-                    "PM Me For More Details.", reply_markup=keyboard
+                    "راسلني في الخاص لمزيد من التفاصيل.", reply_markup=keyboard
                 )
         else:
             await message.reply(
-                "Pm Me For More Details.", reply_markup=keyboard
+                "راسلني في الخاص لمزيد من التفاصيل.", reply_markup=keyboard
             )
     else:
         if len(message.command) >= 2:
             name = (message.text.split(None, 1)[1]).replace(" ", "_").lower()
             if str(name) in HELPABLE:
                 text = (
-                    f"Here is the help for **{HELPABLE[name].__MODULE__}**:\n"
+                    f"إليك المساعدة لقسم **{HELPABLE[name].__MODULE__}**:\n"
                     + HELPABLE[name].__HELP__
                 )
                 await message.reply(text, disable_web_page_preview=True)
@@ -325,10 +326,10 @@ async def help_parser(name, keyboard=None):
     if not keyboard:
         keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help"))
     return (
-        """Hello {first_name}, My name is {bot_name}.
-I'm a group management bot with some useful features.
-You can choose an option below, by clicking a button.
-Also you can ask anything in Support Group.
+        """مرحباً {first_name} 👋
+أنا {bot_name}، بوت إدارة مجموعات تيليجرام بميزات قوية ومفيدة.
+يمكنك اختيار قسم من الأقسام أدناه بالضغط على أحد الأزرار.
+كما يمكنك سؤال أي شيء في مجموعة الدعم.
 """.format(
             first_name=name,
             bot_name=BOT_NAME,
@@ -364,20 +365,20 @@ async def help_button(client, query):
     back_match = re.match(r"help_back", query.data)
     create_match = re.match(r"help_create", query.data)
     top_text = f"""
-Hello {query.from_user.first_name}, My name is {BOT_NAME}.
-I'm a group management bot with some useful features.
-You can choose an option below, by clicking a button.
-Also you can ask anything in Support Group.
+مرحباً {query.from_user.first_name} 👋
+أنا {BOT_NAME}، بوت إدارة مجموعات تيليجرام بميزات قوية ومفيدة.
+يمكنك اختيار قسم بالضغط على أحد الأزرار أدناه.
+كما يمكنك سؤال أي شيء في مجموعة الدعم.
 
-General command are:
- - /start: Start the bot
- - /help: Give this message
+الأوامر العامة:
+ - /start أو "بدء": تشغيل البوت
+ - /help أو "مساعدة": عرض هذه الرسالة
  """
     if mod_match:
         module = (mod_match.group(1)).replace(" ", "_")
         text = (
             "{} **{}**:\n".format(
-                "Here is the help for", HELPABLE[module].__MODULE__
+                "إليك المساعدة لقسم", HELPABLE[module].__MODULE__
             )
             + HELPABLE[module].__HELP__
         )
@@ -390,7 +391,7 @@ General command are:
         await query.message.edit(
             text=text,
             reply_markup=InlineKeyboardMarkup(
-                [[InlineKeyboardButton("back", callback_data="help_back")]]
+                [[InlineKeyboardButton("رجوع", callback_data="help_back")]]
             ),
             disable_web_page_preview=True,
         )

@@ -50,26 +50,17 @@ from wbb.utils.functions import (
     extract_text_and_keyb,
     get_data_and_name,
 )
+from wbb.utils.acmd import cmd as acmd
 
-__MODULE__ = "Filters"
-__HELP__ = """/filters To Get All The Filters In The Chat.
-/filter [FILTER_NAME] To Save A Filter(reply to a message).
-
-Supported filter types are Text, Animation, Photo, Document, Video, video notes, Audio, Voice.
-
-To use more words in a filter use.
-`/filter Hey_there` To filter "Hey there".
-
-/stop [FILTER_NAME] To Stop A Filter.
-/stopall To delete all the filters in a chat (permanently).
-
-You can use markdown or html to save text too.
-
-Checkout /markdownhelp to know more about formattings and other syntax.
-"""
+__MODULE__ = "الفلاتر"
+__HELP__ = """/filters - عرض جميع الفلاتر في المجموعة.
+/filter [الكلمة] [الرد] - إضافة فلتر.
+/stop [الكلمة] - حذف فلتر.
+/stopall - حذف جميع الفلاتر.
+🔸 العربية: فلاتر، اضف_فلتر، احذف_فلتر"""
 
 
-@app.on_message(filters.command("filter") & ~filters.private)
+@app.on_message((filters.command("filter") | acmd(ar=["فلتر"])) & ~filters.private)
 @adminsOnly("can_change_info")
 async def save_filters(_, message):
     try:
@@ -140,7 +131,7 @@ async def save_filters(_, message):
         )
 
 
-@app.on_message(filters.command("filters") & ~filters.private)
+@app.on_message((filters.command("filters") | acmd(ar=["فلاتر"])) & ~filters.private)
 @capture_err
 async def get_filterss(_, message):
     _filters = await get_filters_names(message.chat.id)
@@ -153,7 +144,7 @@ async def get_filterss(_, message):
     await message.reply_text(msg)
 
 
-@app.on_message(filters.command("stop") & ~filters.private)
+@app.on_message((filters.command("stop") | acmd(ar=["ايقاف"])) & ~filters.private)
 @adminsOnly("can_change_info")
 async def del_filter(_, message):
     if len(message.command) < 2:
@@ -268,7 +259,7 @@ async def filters_re(_, message):
             return  # NOTE: Avoid filter spam
 
 
-@app.on_message(filters.command("stopall") & ~filters.private)
+@app.on_message((filters.command("stopall") | acmd(ar=["ايقاف_الكل"])) & ~filters.private)
 @adminsOnly("can_change_info")
 async def stop_all(_, message):
     _filters = await get_filters_names(message.chat.id)

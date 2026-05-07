@@ -24,6 +24,7 @@ SOFTWARE.
 import re
 
 from pyrogram import filters
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import app
 from wbb.core.decorators.errors import capture_err
@@ -42,12 +43,11 @@ from wbb.utils.dbfunctions import (
 from wbb.utils.filter_groups import karma_negative_group, karma_positive_group
 from wbb.utils.functions import get_specific_usernames
 
-__MODULE__ = "Karma"
-__HELP__ = """[UPVOTE] - Use upvote keywords like "+", "+1", "thanks", etc to upvote a message.
-[DOWNVOTE] - Use downvote keywords like "-", "-1", etc to downvote a message.
-/karma_toggle [ENABLE|DISABLE] - Enable or Disable Karma System In Your Chat.
-Reply to a message with /karma to check a user's karma
-Send /karma without replying to any message to check karma list of top 10 users"""
+__MODULE__ = "نقاط الكارما"
+__HELP__ = """استخدم كلمات إيجابية مثل "+", "+1", "thanks", "شكرا" بالرد على رسالة لزيادة كارما المرسل.
+استخدم كلمات سلبية مثل "-", "-1", "fuck" بالرد لإنقاص كارما المرسل.
+/karma - عرض كارمتك.
+🔸 العربية: كارما، نقاطي"""
 
 regex_upvote = r"^(\++|\+1|thx|tnx|tq|ty|thankyou|thank you|thanx|thanks|pro|cool|good|agree|👍|\++ .+)$"
 regex_downvote = r"^(-+|-1|not cool|disagree|worst|bad|👎|-+ .+)$"
@@ -142,7 +142,7 @@ async def downvote(_, message):
     )
 
 
-@app.on_message(filters.command("karma") & filters.group)
+@app.on_message((filters.command("karma") | acmd(ar=["كارما", "نقاطي"])) & filters.group)
 @capture_err
 async def command_karma(_, message):
     chat_id = message.chat.id
@@ -207,7 +207,7 @@ async def command_karma(_, message):
     
     else:
         if not message.reply_to_message.from_user:
-            return await message.reply("Anon user has no karma.")
+            return await message.reply("مجهول user has no karma.")
         
         user_id = message.reply_to_message.from_user.id
         try:

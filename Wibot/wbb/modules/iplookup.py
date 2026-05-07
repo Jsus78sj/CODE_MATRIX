@@ -2,18 +2,18 @@ import asyncio
 
 from pyrogram import filters
 from pyrogram.types import Message
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import app
 from wbb.utils import http
 
 # For /help menu
-__MODULE__ = "iplookup"
-__HELP__ = """
-/iplookup [ip address] to get the details about that ip
-"""
+__MODULE__ = "فحص IP"
+__HELP__ = """/iplookup [IP] - عرض معلومات عنوان IP.
+🔸 العربية: فحص_ايبي [IP]"""
 
 
-@app.on_message(filters.command("iplookup"))
+@app.on_message((filters.command("iplookup") | acmd(ar=["فحص_ايبي"])))
 async def ip_lookup(_, message: Message):
     if len(message.command) < 2:
         return await message.reply_text("ip address is missing")

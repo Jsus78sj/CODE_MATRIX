@@ -30,25 +30,21 @@ from pyrogram import filters
 from pyrogram.enums import ChatMemberStatus, ChatType, ParseMode
 from pyrogram.errors import FloodWait, PeerIdInvalid, ChatAdminRequired
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import BOT_ID, LOG_GROUP_ID, SUDOERS, app
 from wbb.core.decorators.errors import capture_err
 from wbb.utils.dbfeds import *
 from wbb.utils.functions import extract_user, extract_user_and_reason
 
-__MODULE__ = "Federation"
-__HELP__ = """
-Everything is fun, until a spammer starts entering your group, and you have to block it. Then you need to start banning more, and more, and it hurts.
-But then you have many groups, and you don't want this spammer to be in one of your groups - how can you deal? Do you have to manually block it, in all your groups?\n
-**No longer!** With Federation, you can make a ban in one chat overlap with all other chats.\n
-You can even designate federation admins, so your trusted admin can ban all the spammers from chats you want to protect.\n\n
-"""
+__MODULE__ = "الاتحاد"
+__HELP__ = """لمزيد من المعلومات اضغط زر "أوامر مالك الاتحاد" أو "أوامر مشرفي الاتحاد"."""
 
 
 SUPPORT_CHAT = "@WBBSupport"
 
 
-@app.on_message(filters.command("newfed"))
+@app.on_message((filters.command("newfed") | acmd(ar=["انشئ_اتحاد"])))
 @capture_err
 async def new_fed(client, message):
     chat = message.chat
@@ -177,7 +173,7 @@ async def fedtransfer(client, message):
         )
     user_id, fed_id = await extract_user_and_reason(message)
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("لا أستطيع العثور على هذا المستخدم.")
     if not fed_id:
         return await message.reply(
             "you need to provide a Fed Id.\n\nUsage:\n/fedtransfer @usename Fed_Id."
@@ -202,7 +198,7 @@ async def fedtransfer(client, message):
     )
 
 
-@app.on_message(filters.command("myfeds"))
+@app.on_message((filters.command("myfeds") | acmd(ar=["اتحاداتي"])))
 @capture_err
 async def myfeds(client, message):
     user = message.from_user
@@ -344,7 +340,7 @@ async def fed_chat(client, message):
     await message.reply_text(text, parse_mode=ParseMode.HTML)
 
 
-@app.on_message(filters.command("joinfed"))
+@app.on_message((filters.command("joinfed") | acmd(ar=["انضم_اتحاد"])))
 @capture_err
 async def join_fed(client, message):
     chat = message.chat
@@ -407,7 +403,7 @@ async def join_fed(client, message):
         )
 
 
-@app.on_message(filters.command("leavefed"))
+@app.on_message((filters.command("leavefed") | acmd(ar=["غادر_اتحاد"])))
 @capture_err
 async def leave_fed(client, message):
     chat = message.chat
@@ -446,7 +442,7 @@ async def leave_fed(client, message):
         await message.reply_text("Only group creators can use this command!")
 
 
-@app.on_message(filters.command("fedchats"))
+@app.on_message((filters.command("fedchats") | acmd(ar=["مجموعات_الاتحاد"])))
 @capture_err
 async def fed_chat(client, message):
     chat = message.chat
@@ -491,7 +487,7 @@ async def fed_chat(client, message):
         )
 
 
-@app.on_message(filters.command("fedinfo"))
+@app.on_message((filters.command("fedinfo") | acmd(ar=["معلومات_الاتحاد"])))
 @capture_err
 async def fed_info(client, message):
     if len(message.command) < 2:
@@ -523,7 +519,7 @@ async def fed_info(client, message):
     await message.reply_text(reply_text)
 
 
-@app.on_message(filters.command("fedadmins"))
+@app.on_message((filters.command("fedadmins") | acmd(ar=["مشرفي_الاتحاد"])))
 @capture_err
 async def get_all_fadmins_mentions(client, message):
     if len(message.command) < 2:
@@ -557,7 +553,7 @@ async def get_all_fadmins_mentions(client, message):
     await message.reply_text(reply_text)
 
 
-@app.on_message(filters.command("fpromote"))
+@app.on_message((filters.command("fpromote") | acmd(ar=["ترقية_اتحاد"])))
 @capture_err
 async def fpromote(client, message):
     chat = message.chat
@@ -613,14 +609,14 @@ async def fpromote(client, message):
 
         res = await user_join_fed(str(fed_id), user_id)
         if res:
-            await message.reply_text("Successfully Promoted!")
+            await message.reply_text("Successfully تمت الترقية!")
         else:
             await message.reply_text("Failed to promote!")
     else:
         await message.reply_text("Only federation owners can do this!")
 
 
-@app.on_message(filters.command("fdemote"))
+@app.on_message((filters.command("fdemote") | acmd(ar=["تنزيل_اتحاد"])))
 @capture_err
 async def fdemote(client, message):
     chat = message.chat
@@ -665,7 +661,7 @@ async def fdemote(client, message):
         return await message.reply_text("Only federation owners can do this!")
 
 
-@app.on_message(filters.command(["fban", "sfban"]))
+@app.on_message((filters.command(["fban", "sfban"]) | acmd(ar=["حظر_اتحادي"])))
 @capture_err
 async def fban_user(client, message):
     chat = message.chat
@@ -700,7 +696,7 @@ async def fban_user(client, message):
     except PeerIdInvalid:
         return await message.reply_msg("Sorry, I've never met this user.")
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("لا أستطيع العثور على هذا المستخدم.")
     if user_id in all_admins or user_id in SUDOERS:
         return await message.reply_text("I can't ban that user.")
     check_user = await check_banned_user(fed_id, user_id)
@@ -749,9 +745,9 @@ async def fban_user(client, message):
 __**New Federation Ban**__
 **Origin:** {message.chat.title} [`{message.chat.id}`]
 **Admin:** {from_user.mention}
-**Banned User:** {user.mention}
+**المستخدم المحظور:** {user.mention}
 **Banned User ID:** `{user_id}`
-**Reason:** __{reason}__
+**السبب:** __{reason}__
 **Chats:** `{number_of_chats}`"""
     try:
         m2 = await app.send_message(
@@ -769,7 +765,7 @@ __**New Federation Ban**__
         )
 
 
-@app.on_message(filters.command(["unfban", "sunfban"]))
+@app.on_message((filters.command(["unfban", "sunfban"]) | acmd(ar=["فك_حظر_اتحادي"])))
 @capture_err
 async def funban_user(client, message):
     chat = message.chat
@@ -801,7 +797,7 @@ async def funban_user(client, message):
     user_id, reason = await extract_user_and_reason(message)
     user = await app.get_users(user_id)
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("لا أستطيع العثور على هذا المستخدم.")
     if user_id in all_admins or user_id in SUDOERS:
         return await message.reply_text(
             "**How can an admin ever be banned!.**"
@@ -852,7 +848,7 @@ __**New Federation UnBan**__
 **Admin:** {from_user.mention}
 **UnBanned User:** {user.mention}
 **UnBanned User ID:** `{user_id}`
-**Reason:** __{reason}__
+**السبب:** __{reason}__
 **Chats:** `{number_of_chats}`"""
     try:
         m2 = await app.send_message(
@@ -1064,7 +1060,7 @@ async def fed_owner_help(client, cb):
             [
                 [
                     InlineKeyboardButton(
-                        "Back", callback_data="help_module(federation)"
+                        "رجوع", callback_data="help_module(federation)"
                     ),
                 ]
             ]

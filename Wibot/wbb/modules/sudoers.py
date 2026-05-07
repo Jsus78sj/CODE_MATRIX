@@ -31,6 +31,7 @@ from pyrogram import filters, types
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import FloodWait
 from pyrogram.types import InlineKeyboardMarkup
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import (
     BOT_ID,
@@ -51,28 +52,12 @@ from wbb.utils.dbfunctions import (
 )
 from wbb.utils.functions import extract_user, extract_user_and_reason, restart
 
-__MODULE__ = "Sudoers"
-__HELP__ = """
-/stats - To Check System Status.
-
-/gstats - To Check Bot's Global Stats.
-
-/gban - To Ban A User Globally.
-
-/clean_db - Clean database.
-
-/broadcast - To Broadcast A Message To All Groups.
-
-/ubroadcast - To Broadcast A Message To All Users.
-
-/update - To Update And Restart The Bot
-
-/restart - To Restart the bot
-
-/eval - Execute Python Code
-
-/sh - Execute Shell Code
-"""
+__MODULE__ = "المالكين"
+__HELP__ = """/alive - حالة البوت.
+/ping - سرعة استجابة البوت.
+/restart - إعادة تشغيل البوت (سودو فقط).
+/sysinfo - معلومات السيرفر.
+🔸 العربية: حي، بنق، اعادة_التشغيل"""
 
 
 # Stats Module
@@ -107,7 +92,7 @@ async def ban_globally(_, message):
     from_user = message.from_user
 
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("لا أستطيع العثور على هذا المستخدم.")
     if not reason:
         return await message.reply("No reason provided.")
 
@@ -147,9 +132,9 @@ async def ban_globally(_, message):
 __**New Global Ban**__
 **Origin:** {message.chat.title} [`{message.chat.id}`]
 **Admin:** {from_user.mention}
-**Banned User:** {user.mention}
+**المستخدم المحظور:** {user.mention}
 **Banned User ID:** `{user_id}`
-**Reason:** __{reason}__
+**السبب:** __{reason}__
 **Chats:** `{number_of_chats}`"""
     try:
         m2 = await app.send_message(
@@ -175,7 +160,7 @@ __**New Global Ban**__
 async def unban_globally(_, message):
     user_id = await extract_user(message)
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("لا أستطيع العثور على هذا المستخدم.")
     user = await app.get_users(user_id)
 
     is_gbanned = await is_gbanned_user(user.id)
@@ -237,7 +222,7 @@ async def update_restart(_, message):
     await restart(m)
 
 
-@app.on_message(filters.command("restart") & SUDOERS)
+@app.on_message((filters.command("restart") | acmd(ar=["اعادة_تشغيل", "ريست"])) & SUDOERS)
 async def update_restart(_, message):
     m = await message.reply_text(
         "**Bot is restarting now.**"

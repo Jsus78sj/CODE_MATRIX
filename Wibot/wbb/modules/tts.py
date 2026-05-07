@@ -29,6 +29,7 @@ from googletrans import Translator
 from gtts import gTTS
 from pyrogram import filters
 from pyrogram.types import Message
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import app
 
@@ -43,7 +44,7 @@ def convert(text):
     return audio
 
 
-@app.on_message(filters.command("tts"))
+@app.on_message((filters.command("tts") | acmd(ar=["انطق", "نطق"])))
 async def text_to_speech(_, message: Message):
     if not message.reply_to_message:
         return await message.reply_text("Reply to some text ffs.")

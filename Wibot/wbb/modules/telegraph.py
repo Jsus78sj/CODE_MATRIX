@@ -1,14 +1,16 @@
 from pyrogram import filters
 from pyrogram.types import Message
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import app, telegraph
 from wbb.core.decorators.errors import capture_err
 
 __MODULE__ = "Telegraph"
-__HELP__ = "/telegraph [Page name]: Paste styled text on telegraph."
+__HELP__ = """/telegraph [اسم الصفحة] - لصق نص منسق على Telegraph.
+🔸 العربية: تيليجراف"""
 
 
-@app.on_message(filters.command("telegraph"))
+@app.on_message((filters.command("telegraph") | acmd(ar=["تيليجراف"])))
 @capture_err
 async def paste(_, message: Message):
     reply = message.reply_to_message

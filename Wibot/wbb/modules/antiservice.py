@@ -2,6 +2,7 @@
 # Kang With Proper Credits
 
 from pyrogram import filters
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import app
 from wbb.core.decorators.permissions import adminsOnly
@@ -11,15 +12,12 @@ from wbb.utils.dbfunctions import (
     is_antiservice_on,
 )
 
-__MODULE__ = "AntiService"
-__HELP__ = """
-Plugin to delete service messages in a chat!
-
-/antiservice [enable|disable]
-"""
+__MODULE__ = "حذف رسائل الخدمة"
+__HELP__ = """/antiservice [on/off] - تفعيل أو تعطيل حذف رسائل الخدمة (انضمام/مغادرة الأعضاء).
+🔸 العربية: حذف_رسائل_الخدمة [تشغيل/ايقاف]"""
 
 
-@app.on_message(filters.command("antiservice") & ~filters.private)
+@app.on_message((filters.command("antiservice") | acmd(ar=["حذف_رسائل_الخدمة"])) & ~filters.private)
 @adminsOnly("can_change_info")
 async def anti_service(_, message):
     if len(message.command) != 2:

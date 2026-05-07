@@ -1,10 +1,9 @@
 services:
-  wbb:
+  wibot:
     build: .
+    container_name: wibot
     restart: always
-    environment:
-      - PYTHONUNBUFFERED=1
+    env_file:
+      - config.env
     volumes:
-      - ./sessions:/wbb/sessions
-
-
+      - ./sessions:/app/sessions

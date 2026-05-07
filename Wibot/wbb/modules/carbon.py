@@ -23,13 +23,14 @@ SOFTWARE.
 """
 
 from pyrogram import filters
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import app
 from wbb.core.decorators.errors import capture_err
 from wbb.utils.functions import make_carbon
 
 
-@app.on_message(filters.command("carbon"))
+@app.on_message((filters.command("carbon") | acmd(ar=["كود_صورة"])))
 @capture_err
 async def carbon_func(_, message):
     if not message.reply_to_message:

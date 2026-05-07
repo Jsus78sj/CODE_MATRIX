@@ -27,7 +27,7 @@ from pyrogram.types import Message
 
 from wbb import SUDOERS, USERBOT_ID, USERBOT_PREFIX, app2, eor, log, telegraph
 
-__MODULE__ = "Userbot"
+__MODULE__ = "حساب المساعد"
 TEXT = """
 <code>alive</code>  →  Send Alive Message.<br>
 
@@ -81,10 +81,7 @@ TEXT = """
 """
 log.info("Pasting userbot commands on telegraph")
 
-__HELP__ = f"""**Commands:** {telegraph.create_page(
-    "Userbot Commands",
-    html_content=TEXT,
-)['url']}"""
+__HELP__ = """أوامر حساب المساعد (Userbot). يتطلب SESSION_STRING."""
 
 log.info("Done pasting userbot commands on telegraph")
 

@@ -26,6 +26,7 @@ import asyncio
 from pyrogram import filters
 from pyrogram.enums import ChatType
 from pyrogram.errors import FloodWait
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import BOT_ID, BOT_NAME, SUDOERS, USERBOT_NAME, app, app2
 from wbb.core.decorators.errors import capture_err
@@ -78,7 +79,7 @@ async def get_total_users_count():
     return total_count
 
 
-@app.on_message(filters.command("gstats") & SUDOERS)
+@app.on_message((filters.command("gstats") | acmd(ar=["احصائيات"])) & SUDOERS)
 @capture_err
 async def global_stats(_, message):
     m = await app.send_message(

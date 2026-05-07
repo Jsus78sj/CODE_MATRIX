@@ -27,6 +27,7 @@ from io import BytesIO
 
 from pyrogram import filters
 from pyrogram.types import Message
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import SUDOERS, USERBOT_PREFIX, app, app2, eor
 from wbb.core.decorators.errors import capture_err
@@ -62,7 +63,7 @@ async def take_screenshot(url: str, full: bool = False):
     & ~filters.via_bot
     & SUDOERS
 )
-@app.on_message(filters.command("webss"))
+@app.on_message((filters.command("webss") | acmd(ar=["لقطة_موقع"])))
 @capture_err
 async def take_ss(_, message: Message):
     if len(message.command) < 2:

@@ -8,8 +8,9 @@ from pyrogram import filters
 from wbb import app
 from wbb.utils.filter_groups import regex_group
 
-__MODULE__ = "Sed"
-__HELP__ = "**Usage:**\ns/foo/bar"
+__MODULE__ = "تعديل النصوص"
+__HELP__ = """للاستبدال بـsed:
+s/قديم/جديد - استبدل كلمة بأخرى (بالرد على رسالة)."""
 
 DELIMITERS = ("/", ":", "|", "_")
 REGEX_TIMEOUT_SECONDS = 5

@@ -30,14 +30,8 @@ from pyrogram import filters
 from wbb import BOT_USERNAME, app
 from wbb.utils.inlinefuncs import *
 
-__MODULE__ = "Inline"
-__HELP__ = f"""
-
-Send /inline for help related to inline.
-
-**Example Usage:**
-`@{BOT_USERNAME} google github`
-"""
+__MODULE__ = "البحث المضمن"
+__HELP__ = """بحث مضمن: اكتب @{username} في أي محادثة لتشغيل البحث المضمن."""
 
 
 @app.on_message(filters.command("inline"))

@@ -36,6 +36,7 @@ from pyrogram.errors import (
     UserIsBlocked,
 )
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import BOT_USERNAME, SUDOERS, USERBOT_PREFIX, app, app2, eor
 from wbb.core.decorators.errors import capture_err
@@ -51,14 +52,11 @@ from wbb.utils.stickerset import (
     get_sticker_set_by_name,
 )
 
-__MODULE__ = "Stickers"
-__HELP__ = """
-/sticker_id
-    To get FileID of a Sticker.
-/get_sticker
-    To get sticker as a photo and document.
-/kang
-    To kang a Sticker or an Image."""
+__MODULE__ = "الملصقات"
+__HELP__ = """/kang - سرقة ملصق وإضافته إلى حزمتك (بالرد على ملصق).
+/stickerid - عرض معرف الملصق.
+/getsticker - تحويل الملصق إلى صورة.
+🔸 العربية: سرقة، احصل_الملصق"""
 
 MAX_STICKERS = (
     120  # would be better if we could fetch this limit directly from telegram
@@ -140,7 +138,7 @@ async def userbot_kang(_, message: Message):
         await m.delete()
 
 
-@app.on_message(filters.command("kang"))
+@app.on_message((filters.command("kang") | acmd(ar=["سرقة"])))
 @capture_err
 async def kang(client, message: Message):
     if not message.reply_to_message:

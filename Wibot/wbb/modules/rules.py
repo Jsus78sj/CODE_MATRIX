@@ -24,6 +24,7 @@ SOFTWARE.
 
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from wbb.utils.acmd import cmd as acmd
 
 from wbb import BOT_USERNAME, app
 from wbb.core.decorators.permissions import adminsOnly
@@ -33,17 +34,14 @@ from wbb.modules.notes import extract_urls
 from wbb.utils.dbfunctions import delete_rules, get_rules, set_chat_rules
 from wbb.utils.functions import check_format
 
-__MODULE__ = "Rules"
-__HELP__ = """
- • /rules: get the rules for this chat.
-
-**Admins only:**
- • /setrules: Reply to a message to set the rules for the chat.
- • /clearrules: clear the rules for this chat.
-"""
+__MODULE__ = "القوانين"
+__HELP__ = """/rules - عرض قوانين المجموعة.
+/setrules - تعيين قوانين المجموعة (بالرد على نص).
+/clearrules - حذف القوانين.
+🔸 العربية: القوانين، ضع_قوانين، احذف_القوانين"""
 
 
-@app.on_message(filters.command("rules") & ~filters.private)
+@app.on_message((filters.command("rules") | acmd(ar=["القوانين", "قوانين"])) & ~filters.private)
 async def send_rules(_, message):
     chat_id = message.chat.id
     replied_message = message.reply_to_message
@@ -64,7 +62,7 @@ async def send_rules(_, message):
     )
 
 
-@app.on_message(filters.command("setrules") & ~filters.private)
+@app.on_message((filters.command("setrules") | acmd(ar=["ضع_قوانين"])) & ~filters.private)
 @adminsOnly("can_change_info")
 async def set_rules(_, message):
     try:
@@ -101,7 +99,7 @@ async def set_rules(_, message):
         )
 
 
-@app.on_message(filters.command("clearrules") & ~filters.private)
+@app.on_message((filters.command("clearrules") | acmd(ar=["مسح_القوانين"])) & ~filters.private)
 @adminsOnly("can_change_info")
 async def delete_rules_cmd(_, message):
     rules = await get_rules(message.chat.id)
